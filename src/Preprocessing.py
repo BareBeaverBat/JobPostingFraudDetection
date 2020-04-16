@@ -6,6 +6,14 @@ import os
 import pathlib
 import shutil
 
+import nltk
+
+try:
+    from nltk.corpus import stopwords
+except LookupError:
+    nltk.download("stopwords")
+    from nltk.corpus import stopwords
+
 # CSV column indices
 
 TITLE_INDEX = 1
@@ -60,23 +68,24 @@ SALARY_VAL_REGEX = re.compile(r"^\d+$")
 
 # text preprocessing hyperparameters
 
-baselineStopwords = []  # TODO
+baselineStopwords = set(stopwords.words('english'))
 
-URL_REGEX = re.compile(r"#URL_[A-Za-z0-9]*#")
-URL_REPLACEMENT_TOKEN = " <URL> "
+#after lower-casing
+URL_REGEX = re.compile(r"#url_[a-z0-9]*#")
+URL_REPLACEMENT_TOKEN = " <url> "
 
 NONALPHANUMERIC_REGEX = re.compile(r"[^A-Za-z0-9^,!.\/'+-=]")
 
 MULT_WHITESPACE_REGEX = re.compile(r"\s{2,}")
 
 
-def findOrAdd(givenList, givenVal):
+def findOrAdd(givenList, givenVal, canAdd = True):
     ind = -1
     for i, currVal in enumerate(givenList):
         if currVal == givenVal:
             ind = i
             break
-    if ind == -1:
+    if ind == -1 and canAdd:
         givenList.append(givenVal)
         ind = len(givenList) - 1
 
@@ -92,20 +101,20 @@ class CategoriesSummary:
         self.industryVals = []
         self.functionVals = []
 
-    def findOrAddEmploymentType(self, currEmploymentType):
-        return findOrAdd(self.employmentTypeVals, currEmploymentType)
+    def findOrAddEmploymentType(self, currEmploymentType, shouldAddNew):
+        return findOrAdd(self.employmentTypeVals, currEmploymentType, shouldAddNew)
 
-    def findOrAddRequiredExperience(self, currRequiredExperience):
-        return findOrAdd(self.requiredExperienceVals, currRequiredExperience)
+    def findOrAddRequiredExperience(self, currRequiredExperience, shouldAddNew):
+        return findOrAdd(self.requiredExperienceVals, currRequiredExperience, shouldAddNew)
 
-    def findOrAddRequiredEducation(self, currRequiredEducation):
-        return findOrAdd(self.requiredEducationVals, currRequiredEducation)
+    def findOrAddRequiredEducation(self, currRequiredEducation, shouldAddNew):
+        return findOrAdd(self.requiredEducationVals, currRequiredEducation, shouldAddNew)
 
-    def findOrAddIndustry(self, currIndustry):
-        return findOrAdd(self.industryVals, currIndustry)
+    def findOrAddIndustry(self, currIndustry, shouldAddNew):
+        return findOrAdd(self.industryVals, currIndustry, shouldAddNew)
 
-    def findOrAddFunction(self, currFunction):
-        return findOrAdd(self.functionVals, currFunction)
+    def findOrAddFunction(self, currFunction, shouldAddNew):
+        return findOrAdd(self.functionVals, currFunction, shouldAddNew)
 
     def saveToFiles(self, dirPath):
         employmentTypeOptionsFilePath = os.path.join(dirPath, "employment_type_options.txt")
@@ -245,7 +254,7 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
     return processedText
 
 
-def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesObj):
+def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesObj, shouldBuildSummaries=True):
     processedListing = {}
 
     # copy the boolean values
@@ -256,23 +265,23 @@ def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesOb
 
     # one-hot encode the categorical attributes
     currEmploymentType = rawDataRow[EMPLOYMENT_TYPE_INDEX]
-    currEmploymentTypeInd = categorySummariesObj.findOrAddEmploymentType(currEmploymentType)
+    currEmploymentTypeInd = categorySummariesObj.findOrAddEmploymentType(currEmploymentType, shouldBuildSummaries)
     processedListing[EMPLOYMENT_TYPE_LABEL] = currEmploymentTypeInd
 
     currRequiredExperience = rawDataRow[REQUIRED_EXPERIENCE_INDEX]
-    currRequiredExperienceInd = categorySummariesObj.findOrAddRequiredExperience(currRequiredExperience)
+    currRequiredExperienceInd = categorySummariesObj.findOrAddRequiredExperience(currRequiredExperience, shouldBuildSummaries)
     processedListing[REQUIRED_EXPERIENCE_LABEL] = currRequiredExperienceInd
 
     currRequiredEducation = rawDataRow[REQUIRED_EDUCATION_INDEX]
-    currRequiredEducationInd = categorySummariesObj.findOrAddRequiredEducation(currRequiredEducation)
+    currRequiredEducationInd = categorySummariesObj.findOrAddRequiredEducation(currRequiredEducation, shouldBuildSummaries)
     processedListing[REQUIRED_EDUCATION_LABEL] = currRequiredEducationInd
 
     currIndustry = rawDataRow[INDUSTRY_INDEX]
-    currIndustryInd = categorySummariesObj.findOrAddIndustry(currIndustry)
+    currIndustryInd = categorySummariesObj.findOrAddIndustry(currIndustry, shouldBuildSummaries)
     processedListing[INDUSTRY_LABEL] = currIndustryInd
 
     currFunction = rawDataRow[FUNCTION_INDEX]
-    currFunctionInd = categorySummariesObj.findOrAddFunction(currFunction)
+    currFunctionInd = categorySummariesObj.findOrAddFunction(currFunction, shouldBuildSummaries)
     processedListing[FUNCTION_LABEL] = currFunctionInd
 
     # process salary attribute, eliminating invalid salary entries
@@ -309,37 +318,44 @@ def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesOb
     titleVal = rawDataRow[TITLE_INDEX]
     cleanedTitleVal = cleanText(titleVal, baselineStopwords)
     processedListing[TITLE_LABEL] = cleanedTitleVal
-    textAttributeSummariesObj.addTitle(cleanedTitleVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addTitle(cleanedTitleVal)
 
     locationVal = rawDataRow[LOCATION_INDEX]
     cleanedLocationVal = cleanText(locationVal, baselineStopwords)
     processedListing[LOCATION_LABEL] = cleanedLocationVal
-    textAttributeSummariesObj.addLocation(cleanedLocationVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addLocation(cleanedLocationVal)
 
     departmentVal = rawDataRow[DEPARTMENT_INDEX]
     cleanedDepartmentVal = cleanText(departmentVal, baselineStopwords)
     processedListing[DEPARTMENT_LABEL] = cleanedDepartmentVal
-    textAttributeSummariesObj.addDepartment(cleanedDepartmentVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addDepartment(cleanedDepartmentVal)
 
     companyProfileVal = rawDataRow[COMPANY_PROFILE_INDEX]
     cleanedCompanyProfileVal = cleanText(companyProfileVal, baselineStopwords)
     processedListing[COMPANY_PROFILE_LABEL] = cleanedCompanyProfileVal
-    textAttributeSummariesObj.addCompanyProfile(cleanedCompanyProfileVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addCompanyProfile(cleanedCompanyProfileVal)
 
     descriptionVal = rawDataRow[DESCRIPTION_INDEX]
     cleanedDescriptionVal = cleanText(descriptionVal, baselineStopwords)
     processedListing[DESCRIPTION_LABEL] = cleanedDescriptionVal
-    textAttributeSummariesObj.addDescription(cleanedDescriptionVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addDescription(cleanedDescriptionVal)
 
     requirementsVal = rawDataRow[REQUIREMENTS_INDEX]
     cleanedRequirementsVal = cleanText(requirementsVal, baselineStopwords)
     processedListing[REQUIREMENTS_LABEL] = cleanedRequirementsVal
-    textAttributeSummariesObj.addRequirements(cleanedRequirementsVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addRequirements(cleanedRequirementsVal)
 
     benefitsVal = rawDataRow[BENEFITS_INDEX]
     cleanedBenefitsVal = cleanText(benefitsVal, baselineStopwords)
     processedListing[BENEFITS_LABEL] = cleanedBenefitsVal
-    textAttributeSummariesObj.addBenefits(cleanedBenefitsVal)
+    if shouldBuildSummaries:
+        textAttributeSummariesObj.addBenefits(cleanedBenefitsVal)
 
     return processedListing
 
@@ -352,23 +368,18 @@ def loadData(fpath):
     with open(fpath, encoding="utf-8") as raw_csv:
         dataReader = csv.reader(raw_csv)
         tempHeaderRow = next(dataReader)  # eliminate header row
-        tempRow1 = next(dataReader)
-        tempRow2= next(dataReader)
-        tempRow3 = next(dataReader)
-        tempRow4 = next(dataReader)
 
         # preprocesses the data as it's loaded
         for row in dataReader:
             processedRow = processJobListing(row, allCategories, allTextAttributes)
             processedData.append(processedRow)
-            # print(processedRow, flush=True)
 
     return processedData, allCategories, allTextAttributes
 
 
-currDirStr = os.getcwd()
-currDir = pathlib.Path(currDirStr)
-projectDir = currDir.parent
+srcDirStr = os.getcwd()
+srcDir = pathlib.Path(srcDirStr)
+projectDir = srcDir.parent
 
 DATA_PATH = os.path.join(projectDir, "data")
 RAW_DATA_PATH = os.path.join(DATA_PATH, "raw")
@@ -376,28 +387,28 @@ PROCESSED_DATA_PATH = os.path.join(DATA_PATH, "processed")
 
 PROCESSED_FILE_PREFIX = "cleaned_"
 
-datasetDirName = "kaggle_fake_job_postings"
+datasetDirName = PROCESSED_FILE_PREFIX + "kaggle_fake_job_postings"
 datasetDirPath = os.path.join(PROCESSED_DATA_PATH, datasetDirName)
-# print(list(datasetDirPath))
-# print(datasetDirPath)
-if os.path.exists(datasetDirPath):
-    print("overwriting directory at path ", datasetDirPath)
-    shutil.rmtree(datasetDirPath)
-os.mkdir(datasetDirPath)
 
 rawFname = "fake_job_postings.csv"
 rawFpath = os.path.join(RAW_DATA_PATH, rawFname)
 
-cleanedData, categorySummaries, textAttributeSummaries = loadData(rawFpath)
-cleanedDataDf = pd.DataFrame(cleanedData)
+if __name__ == "__main__":
+    if os.path.exists(datasetDirPath):
+        print("overwriting directory at path ", datasetDirPath)
+        shutil.rmtree(datasetDirPath)
+    os.mkdir(datasetDirPath)
 
-cleanedDataPath = os.path.join(datasetDirPath, PROCESSED_FILE_PREFIX + rawFname)
-dataSaveResult = cleanedDataDf.to_csv(cleanedDataPath)
-if dataSaveResult is not None:
-    print("saving dataframe failed with a message (about csv format?): ", dataSaveResult)
+    cleanedData, categorySummaries, textAttributeSummaries = loadData(rawFpath)
+    cleanedDataDf = pd.DataFrame(cleanedData)
 
-categorySummaries.saveToFiles(datasetDirPath)
-textAttributeSummaries.saveToFile(datasetDirPath)
+    cleanedDataPath = os.path.join(datasetDirPath, PROCESSED_FILE_PREFIX + rawFname)
+    dataSaveResult = cleanedDataDf.to_csv(cleanedDataPath)
+    if dataSaveResult is not None:
+        print("saving dataframe failed with a message (about csv format?): ", dataSaveResult)
+
+    categorySummaries.saveToFiles(datasetDirPath)
+    textAttributeSummaries.saveToFile(datasetDirPath)
 
 
 
