@@ -61,6 +61,10 @@ SALARY_VAL_REGEX = re.compile(r"^\d+$")
 # text preprocessing hyperparameters
 
 baselineStopwords = []  # TODO
+
+URL_REGEX = re.compile(r"#URL_[A-Za-z0-9]*#")
+URL_REPLACEMENT_TOKEN = " <URL> "
+
 NONALPHANUMERIC_REGEX = re.compile(r"[^A-Za-z0-9^,!.\/'+-=]")
 
 MULT_WHITESPACE_REGEX = re.compile(r"\s{2,}")
@@ -141,25 +145,25 @@ class TextAttributeSummaries:
         self.cumulBenefitsText = ""
 
     def addTitle(self, currTitle):
-        self.cumulTitlesText += currTitle + " "
+        self.cumulTitlesText += currTitle + "\n\n"
 
     def addLocation(self, currLocation):
-        self.cumulLocationsText += currLocation + " "
+        self.cumulLocationsText += currLocation + "\n\n"
 
     def addDepartment(self, currDepartment):
-        self.cumulDepartmentsText += currDepartment + " "
+        self.cumulDepartmentsText += currDepartment + "\n\n"
 
     def addCompanyProfile(self, currCompanyProfile):
-        self.cumulCompanyProfilesText += currCompanyProfile + " "
+        self.cumulCompanyProfilesText += currCompanyProfile + "\n\n"
 
     def addDescription(self, currDescription):
-        self.cumulDescriptionsText += currDescription + " "
+        self.cumulDescriptionsText += currDescription + "\n\n"
 
     def addRequirements(self, currRequirements):
-        self.cumulRequirementsText += currRequirements + " "
+        self.cumulRequirementsText += currRequirements + "\n\n"
 
     def addBenefits(self, currBenefits):
-        self.cumulBenefitsText += currBenefits + " "
+        self.cumulBenefitsText += currBenefits + "\n\n"
 
     def saveToFile(self, dirPath):
         titlesSummaryFilePath = os.path.join(dirPath, "all_titles.txt")
@@ -192,16 +196,14 @@ class TextAttributeSummaries:
 def cleanText(rawText, stopwordsList=None, stemmer=None):
     processedText = rawText.lower()
 
-    # TODO replace URLs with generic token for 'URL was here'
+    processedText = re.sub(URL_REGEX, URL_REPLACEMENT_TOKEN, processedText)
 
-    # todo clear exclamation points, colons, "amp;", hyphen
+    processedText = re.sub(r"&amp;", " and ", processedText)
 
     processedText = re.sub(NONALPHANUMERIC_REGEX, " ", processedText)
 
-    # TODO review these- with some I'm not sure
-    #  whether they work as written (raw string vs escape characters?) or whether I want them
     processedText = re.sub(r"what's", "what is ", processedText)
-    processedText = re.sub(r"\'s", " ", processedText)
+    processedText = re.sub(r"'s", " ", processedText)
     processedText = re.sub(r"\'ve", " have ", processedText)
     processedText = re.sub(r"can't", "cannot ", processedText)
     processedText = re.sub(r"n't", " not ", processedText)
@@ -212,11 +214,11 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
     processedText = re.sub(r",", " ", processedText)
     processedText = re.sub(r"\.", " ", processedText)
     processedText = re.sub(r"!", " ! ", processedText)
-    processedText = re.sub(r"\/", " ", processedText)
+    processedText = re.sub(r"/", " ", processedText)
     processedText = re.sub(r"\^", " ^ ", processedText)
     processedText = re.sub(r"\+", " + ", processedText)
-    processedText = re.sub(r"\-", " - ", processedText)
-    processedText = re.sub(r"\=", " = ", processedText)
+    processedText = re.sub(r"-", " - ", processedText)
+    processedText = re.sub(r"=", " = ", processedText)
     processedText = re.sub(r"'", " ", processedText)
     processedText = re.sub(r"(\d+)(k)", r"\g<1>000", processedText)
     processedText = re.sub(r":", " : ", processedText)
@@ -230,7 +232,6 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
 
     processedText = re.sub(MULT_WHITESPACE_REGEX, " ", processedText)
 
-    # todo does this need to go before the regex?
     if stopwordsList is not None:
         textArr = processedText.split()
         textArr = [currWord for currWord in textArr if not currWord in stopwordsList]
