@@ -72,9 +72,18 @@ baselineStopwords = set(stopwords.words('english'))
 
 #after lower-casing
 URL_REGEX = re.compile(r"#url_[a-z0-9]*#")
-URL_REPLACEMENT_TOKEN = " <url> "
+URL_REPLACEMENT_TOKEN = " url "
+EMAIL_REGEX= re.compile(r"#email_[a-z0-9]*#")
+EMAIL_REPLACEMENT_TOKEN=" email "
+PHONE_REGEX= re.compile(r"#phone_[a-z0-9]*#")
+PHONE_REPLACEMENT_TOKEN=" phone "
+
+COMMA_SEPARATED_NUM_REGEX = re.compile(r"(\d*),(\d*)")
+COMMA_SEPARATED_NUM_REPLACEMENT = "$1$2"
 
 NONALPHANUMERIC_REGEX = re.compile(r"[^A-Za-z0-9^,!.\/'+-=]")
+
+NON_ALPHANUM_SPAM_REGEX= re.compile(r"([^A-Za-z0-9^]+\s*){2,}")
 
 MULT_WHITESPACE_REGEX = re.compile(r"\s{2,}")
 
@@ -206,8 +215,11 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
     processedText = rawText.lower()
 
     processedText = re.sub(URL_REGEX, URL_REPLACEMENT_TOKEN, processedText)
-
+    processedText = re.sub(EMAIL_REGEX, EMAIL_REPLACEMENT_TOKEN, processedText)
+    processedText = re.sub(PHONE_REGEX, PHONE_REPLACEMENT_TOKEN, processedText)
     processedText = re.sub(r"&amp;", " and ", processedText)
+    processedText = re.sub(COMMA_SEPARATED_NUM_REGEX, COMMA_SEPARATED_NUM_REPLACEMENT, processedText)
+
 
     processedText = re.sub(NONALPHANUMERIC_REGEX, " ", processedText)
 
@@ -238,6 +250,8 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
     processedText = re.sub(r" 9 11 ", "911", processedText)
     processedText = re.sub(r"e - mail", "email", processedText)
     processedText = re.sub(r"j k", "jk", processedText)
+
+    processedText = re.sub(NON_ALPHANUM_SPAM_REGEX, " ", processedText)
 
     processedText = re.sub(MULT_WHITESPACE_REGEX, " ", processedText)
 
