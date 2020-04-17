@@ -78,8 +78,8 @@ EMAIL_REPLACEMENT_TOKEN=" email "
 PHONE_REGEX= re.compile(r"#phone_[a-z0-9]*#")
 PHONE_REPLACEMENT_TOKEN=" phone "
 
-COMMA_SEPARATED_NUM_REGEX = re.compile(r"(\d*),(\d*)")
-COMMA_SEPARATED_NUM_REPLACEMENT = "$1$2"
+COMMA_SEPARATED_NUM_REGEX = re.compile(r"(\d+),(\d+)")
+COMMA_SEPARATED_NUM_REPLACEMENT = r" \1\2 "
 
 NONALPHANUMERIC_REGEX = re.compile(r"[^A-Za-z0-9^,!.\/'+-=]")
 
@@ -233,7 +233,7 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
     processedText = re.sub(r"\'d", " would ", processedText)
     processedText = re.sub(r"\'ll", " will ", processedText)
     processedText = re.sub(r",", " ", processedText)
-    processedText = re.sub(r"\.", " ", processedText)
+    processedText = re.sub(r"(\D)\.(\D)", r"\1 \2", processedText)
     processedText = re.sub(r"!", " ! ", processedText)
     processedText = re.sub(r"/", " ", processedText)
     processedText = re.sub(r"\^", " ^ ", processedText)
@@ -243,7 +243,7 @@ def cleanText(rawText, stopwordsList=None, stemmer=None):
     processedText = re.sub(r"'", " ", processedText)
     processedText = re.sub(r"(\d+)(k)", r"\g<1>000", processedText)
     processedText = re.sub(r":", " : ", processedText)
-    processedText = re.sub(r" e g ", " eg ", processedText)
+    processedText = re.sub(r" e ?g ", " eg ", processedText)
     processedText = re.sub(r" b g ", " bg ", processedText)
     processedText = re.sub(r" u s ", " american ", processedText)
     processedText = re.sub(r"\0s", "0", processedText)
@@ -330,19 +330,19 @@ def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesOb
 
     # basic processing of text attributes
     titleVal = rawDataRow[TITLE_INDEX]
-    cleanedTitleVal = cleanText(titleVal, baselineStopwords)
+    cleanedTitleVal = cleanText(titleVal)
     processedListing[TITLE_LABEL] = cleanedTitleVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addTitle(cleanedTitleVal)
 
     locationVal = rawDataRow[LOCATION_INDEX]
-    cleanedLocationVal = cleanText(locationVal, baselineStopwords)
+    cleanedLocationVal = cleanText(locationVal)
     processedListing[LOCATION_LABEL] = cleanedLocationVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addLocation(cleanedLocationVal)
 
     departmentVal = rawDataRow[DEPARTMENT_INDEX]
-    cleanedDepartmentVal = cleanText(departmentVal, baselineStopwords)
+    cleanedDepartmentVal = cleanText(departmentVal)
     processedListing[DEPARTMENT_LABEL] = cleanedDepartmentVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addDepartment(cleanedDepartmentVal)
