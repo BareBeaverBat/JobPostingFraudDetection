@@ -88,6 +88,18 @@ NON_ALPHANUM_SPAM_REGEX= re.compile(r"([^A-Za-z0-9^]+\s*){2,}")
 MULT_WHITESPACE_REGEX = re.compile(r"\s{2,}")
 
 
+TITLES_SUMMARY_FILENAME = "all_titles.txt"
+LOCATIONS_SUMMARY_FILENAME = "all_locations.txt"
+DEPARTMENTS_SUMMARY_FILENAME = "all_departments.txt"
+COMPANY_PROFILES_SUMMARY_FILENAME = "all_company_profiles.txt"
+DESCRIPTIONS_SUMMARY_FILENAME = "all_descriptions.txt"
+REQUIREMENTS_SUMMARY_FILENAME = "all_requirements.txt"
+BENEFITS_SUMMARY_FILENAME = "all_benefits.txt"
+
+
+
+
+
 def findOrAdd(givenList, givenVal, canAdd = True):
     ind = -1
     for i, currVal in enumerate(givenList):
@@ -184,25 +196,25 @@ class TextAttributeSummaries:
         self.cumulBenefitsText += currBenefits + "\n\n"
 
     def saveToFile(self, dirPath):
-        titlesSummaryFilePath = os.path.join(dirPath, "all_titles.txt")
+        titlesSummaryFilePath = os.path.join(dirPath, TITLES_SUMMARY_FILENAME)
         with open(titlesSummaryFilePath, mode="w") as titlesSummaryFile:
             titlesSummaryFile.write(self.cumulTitlesText)
-        locationsSummaryFilePath = os.path.join(dirPath, "all_locations.txt")
+        locationsSummaryFilePath = os.path.join(dirPath, LOCATIONS_SUMMARY_FILENAME)
         with open(locationsSummaryFilePath, mode="w") as locationsSummaryFile:
             locationsSummaryFile.write(self.cumulLocationsText)
-        departmentsSummaryFilePath = os.path.join(dirPath, "all_departments.txt")
+        departmentsSummaryFilePath = os.path.join(dirPath, DEPARTMENTS_SUMMARY_FILENAME)
         with open(departmentsSummaryFilePath, mode="w") as departmentsSummaryFile:
             departmentsSummaryFile.write(self.cumulDepartmentsText)
-        companyProfilesSummaryFilePath = os.path.join(dirPath, "all_company_profiles.txt")
+        companyProfilesSummaryFilePath = os.path.join(dirPath, COMPANY_PROFILES_SUMMARY_FILENAME)
         with open(companyProfilesSummaryFilePath, mode="w") as companyProfilesSummaryFile:
             companyProfilesSummaryFile.write(self.cumulCompanyProfilesText)
-        descriptionsSummaryFilePath = os.path.join(dirPath, "all_descriptions.txt")
+        descriptionsSummaryFilePath = os.path.join(dirPath, DESCRIPTIONS_SUMMARY_FILENAME)
         with open(descriptionsSummaryFilePath, mode="w") as descriptionsSummaryFile:
             descriptionsSummaryFile.write(self.cumulDescriptionsText)
-        requirementsSummaryFilePath = os.path.join(dirPath, "all_requirements.txt")
+        requirementsSummaryFilePath = os.path.join(dirPath, REQUIREMENTS_SUMMARY_FILENAME)
         with open(requirementsSummaryFilePath, mode="w") as requirementsSummaryFile:
             requirementsSummaryFile.write(self.cumulRequirementsText)
-        benefitsSummaryFilePath = os.path.join(dirPath, "all_benefits.txt")
+        benefitsSummaryFilePath = os.path.join(dirPath, BENEFITS_SUMMARY_FILENAME)
         with open(benefitsSummaryFilePath, mode="w") as benefitsSummaryFile:
             benefitsSummaryFile.write(self.cumulBenefitsText)
 
@@ -407,6 +419,8 @@ datasetDirPath = os.path.join(PROCESSED_DATA_PATH, datasetDirName)
 rawFname = "fake_job_postings.csv"
 rawFpath = os.path.join(RAW_DATA_PATH, rawFname)
 
+cleanedDataPath = os.path.join(datasetDirPath, PROCESSED_FILE_PREFIX + rawFname)
+
 if __name__ == "__main__":
     if os.path.exists(datasetDirPath):
         print("overwriting directory at path ", datasetDirPath)
@@ -416,7 +430,6 @@ if __name__ == "__main__":
     cleanedData, categorySummaries, textAttributeSummaries = loadData(rawFpath)
     cleanedDataDf = pd.DataFrame(cleanedData)
 
-    cleanedDataPath = os.path.join(datasetDirPath, PROCESSED_FILE_PREFIX + rawFname)
     dataSaveResult = cleanedDataDf.to_csv(cleanedDataPath)
     if dataSaveResult is not None:
         print("saving dataframe failed with a message (about csv format?): ", dataSaveResult)
