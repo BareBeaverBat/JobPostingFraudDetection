@@ -10,7 +10,9 @@ import nltk
 
 try:
     from nltk.corpus import stopwords
-except LookupError:
+    dummyStopwords = stopwords.words("english")
+except Exception as e:
+    print("handling exception when importing stopwords from nltk: ", str(e))
     nltk.download("stopwords")
     from nltk.corpus import stopwords
 
@@ -408,8 +410,16 @@ srcDir = pathlib.Path(srcDirStr)
 projectDir = srcDir.parent
 
 DATA_PATH = os.path.join(projectDir, "data")
+if not os.path.exists(DATA_PATH):
+    os.mkdir(DATA_PATH)
+
 RAW_DATA_PATH = os.path.join(DATA_PATH, "raw")
+if not os.path.exists(RAW_DATA_PATH):
+    os.mkdir(RAW_DATA_PATH)
+
 PROCESSED_DATA_PATH = os.path.join(DATA_PATH, "processed")
+if not os.path.exists(PROCESSED_DATA_PATH):
+    os.mkdir(PROCESSED_DATA_PATH)
 
 PROCESSED_FILE_PREFIX = "cleaned_"
 
