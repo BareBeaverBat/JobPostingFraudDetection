@@ -225,8 +225,15 @@ class TextAttributeSummaries:
 
 # based on
 #  https://www.kaggle.com/lystdo/lstm-with-word2vec-embeddings
-def cleanText(rawText, stopwordsList=None, stemmer=None):
+def cleanText(rawText, stopwordsList=None, stemmer=None, shouldSearchForSplicedWords= False):
     processedText = rawText.lower()
+
+    if shouldSearchForSplicedWords:
+        pass
+        #todo try using pyenchant SpellChecker over the text & finding words
+        # which are spliced together without a space between them
+        # then replacing those in-line with the unspliced words
+
 
     processedText = re.sub(URL_REGEX, URL_REPLACEMENT_TOKEN, processedText)
     processedText = re.sub(EMAIL_REGEX, EMAIL_REPLACEMENT_TOKEN, processedText)
