@@ -5,6 +5,8 @@ import numpy as np
 import os
 import pathlib
 import shutil
+import enchant
+from enchant.checker import SpellChecker
 
 import nltk
 
@@ -49,11 +51,11 @@ SALARY_VAL_REGEX = re.compile(r"^\d+$")
 baselineStopwords = set(stopwords.words('english'))
 
 #after lower-casing
-URL_REGEX = re.compile(r"#url_[a-z0-9]*#")
+URL_REGEX = re.compile(r"#URL_[A-Za-z0-9]*#")
 URL_REPLACEMENT_TOKEN = " url "
-EMAIL_REGEX= re.compile(r"#email_[a-z0-9]*#")
+EMAIL_REGEX= re.compile(r"#EMAIL_[A-Za-z0-9]*#")
 EMAIL_REPLACEMENT_TOKEN=" email "
-PHONE_REGEX= re.compile(r"#phone_[a-z0-9]*#")
+PHONE_REGEX= re.compile(r"#PHONE_[A-Za-z0-9]*#")
 PHONE_REPLACEMENT_TOKEN=" phone "
 
 COMMA_SEPARATED_NUM_REGEX = re.compile(r"(\d+),(\d+)")
@@ -191,17 +193,36 @@ class TextAttributeSummaries:
 
 # preprocessing functions
 
+
+def unspliceWords(langDict, rawText):
+    checker = SpellChecker(lang=langDict, text=rawText)
+    allBadWordCount = 0
+    splicedWords = []
+
+    for errToken in checker:
+        allBadWordCount += 1
+        errStr = errToken.word
+        errLen = len(errStr)
+
+        if not checker.check(errStr):
+            for charInd in range(2, errLen - 2):
+                firstWordStr = errStr[0:charInd]
+                secondWordStr = errStr[charInd:]
+                if checker.check(firstWordStr) \
+                        and checker.check(secondWordStr):
+                    splicedWords.append((errStr, firstWordStr, secondWordStr))
+                    errToken.replace_always(firstWordStr + " " + secondWordStr)
+                    break
+        else:
+            print("unsplicer iterated over a not-mispelled token ", errStr, "!!!")
+
+    unsplicedText = checker.get_text()
+    return unsplicedText, allBadWordCount, splicedWords
+
 # based on
 #  https://www.kaggle.com/lystdo/lstm-with-word2vec-embeddings
-def cleanText(rawText, stopwordsList=None, stemmer=None, shouldSearchForSplicedWords= False):
-    processedText = rawText.lower()
-
-    if shouldSearchForSplicedWords:
-        pass
-        #todo try using pyenchant SpellChecker over the text & finding words
-        # which are spliced together without a space between them
-        # then replacing those in-line with the unspliced words
-
+def cleanText(rawText, stopwordsList=None, stemmer=None, splicedWordsSearchDictionary= None):
+    processedText = rawText
 
     processedText = re.sub(URL_REGEX, URL_REPLACEMENT_TOKEN, processedText)
     processedText = re.sub(EMAIL_REGEX, EMAIL_REPLACEMENT_TOKEN, processedText)
@@ -212,12 +233,12 @@ def cleanText(rawText, stopwordsList=None, stemmer=None, shouldSearchForSplicedW
 
     processedText = re.sub(NONALPHANUMERIC_REGEX, " ", processedText)
 
-    processedText = re.sub(r"what's", "what is ", processedText)
+    processedText = re.sub(r"[Ww]hat's", "what is ", processedText)
     processedText = re.sub(r"'s", " ", processedText)
     processedText = re.sub(r"\'ve", " have ", processedText)
-    processedText = re.sub(r"can't", "cannot ", processedText)
+    processedText = re.sub(r"[Cc]an't", "can not ", processedText)
     processedText = re.sub(r"n't", " not ", processedText)
-    processedText = re.sub(r"i'm", "i am ", processedText)
+    processedText = re.sub(r"[Ii]'m", "i am ", processedText)
     processedText = re.sub(r"\'re", " are ", processedText)
     processedText = re.sub(r"\'d", " would ", processedText)
     processedText = re.sub(r"\'ll", " will ", processedText)
@@ -234,15 +255,24 @@ def cleanText(rawText, stopwordsList=None, stemmer=None, shouldSearchForSplicedW
     processedText = re.sub(r":", " : ", processedText)
     processedText = re.sub(r" e ?g ", " eg ", processedText)
     processedText = re.sub(r" b g ", " bg ", processedText)
-    processedText = re.sub(r" u s ", " american ", processedText)
+    processedText = re.sub(r" U S ", " american ", processedText)
     processedText = re.sub(r"\0s", "0", processedText)
     processedText = re.sub(r" 9 11 ", "911", processedText)
-    processedText = re.sub(r"e - mail", "email", processedText)
+    processedText = re.sub(r"[Ee] ?- ?mail", "email", processedText)
     processedText = re.sub(r"j k", "jk", processedText)
+
+    wordUnsplicings = set()
+
+    if splicedWordsSearchDictionary != None:
+        unsplicedText, badWordsCount, splicedWords = unspliceWords(splicedWordsSearchDictionary, processedText)
+        processedText = unsplicedText
+        wordUnsplicings = set(splicedWords)
 
     processedText = re.sub(NON_ALPHANUM_SPAM_REGEX, " ", processedText)
 
     processedText = re.sub(MULT_WHITESPACE_REGEX, " ", processedText)
+
+    processedText = processedText.lower()
 
     if stopwordsList is not None:
         textArr = processedText.split()
@@ -254,10 +284,10 @@ def cleanText(rawText, stopwordsList=None, stemmer=None, shouldSearchForSplicedW
         stemmedWords = [stemmer.stem(currWord) for currWord in textArr]
         processedText = " ".join(stemmedWords)
 
-    return processedText
+    return processedText, wordUnsplicings
 
 
-def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesObj, shouldBuildSummaries=True):
+def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesObj, unsplicingDict, shouldBuildSummaries=True):
     processedListing = {}
 
     # copy the boolean values
@@ -317,50 +347,61 @@ def processJobListing(rawDataRow, categorySummariesObj, textAttributeSummariesOb
     processedListing[SALARY_RANGE_LABEL] = salaryRange
     processedListing[SALARY_MIDPT_LABEL] = salaryMidpt
 
+    allWordUnsplicings = set()
+
     # basic processing of text attributes
     titleVal = rawDataRow[TITLE_INDEX]
-    cleanedTitleVal = cleanText(titleVal)
+    cleanedTitleVal, titleWordUnsplicings = cleanText(titleVal)
     processedListing[TITLE_LABEL] = cleanedTitleVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addTitle(cleanedTitleVal)
+    allWordUnsplicings |= titleWordUnsplicings
+
 
     locationVal = rawDataRow[LOCATION_INDEX]
-    cleanedLocationVal = cleanText(locationVal)
+    cleanedLocationVal, locationWordUnsplicings = cleanText(locationVal)
     processedListing[LOCATION_LABEL] = cleanedLocationVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addLocation(cleanedLocationVal)
+    allWordUnsplicings |= locationWordUnsplicings
 
     departmentVal = rawDataRow[DEPARTMENT_INDEX]
-    cleanedDepartmentVal = cleanText(departmentVal)
+    cleanedDepartmentVal, departmentWordUnsplicings = cleanText(departmentVal)
     processedListing[DEPARTMENT_LABEL] = cleanedDepartmentVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addDepartment(cleanedDepartmentVal)
+    allWordUnsplicings |= departmentWordUnsplicings
 
     companyProfileVal = rawDataRow[COMPANY_PROFILE_INDEX]
-    cleanedCompanyProfileVal = cleanText(companyProfileVal, baselineStopwords)
+    cleanedCompanyProfileVal, companyProfileWordUnsplicings = cleanText(companyProfileVal, baselineStopwords, splicedWordsSearchDictionary= unsplicingDict)
     processedListing[COMPANY_PROFILE_LABEL] = cleanedCompanyProfileVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addCompanyProfile(cleanedCompanyProfileVal)
+    allWordUnsplicings |= companyProfileWordUnsplicings
 
     descriptionVal = rawDataRow[DESCRIPTION_INDEX]
-    cleanedDescriptionVal = cleanText(descriptionVal, baselineStopwords)
+    cleanedDescriptionVal, descriptionWordUnsplicings = cleanText(descriptionVal, baselineStopwords, splicedWordsSearchDictionary= unsplicingDict)
     processedListing[DESCRIPTION_LABEL] = cleanedDescriptionVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addDescription(cleanedDescriptionVal)
+    allWordUnsplicings |= descriptionWordUnsplicings
 
     requirementsVal = rawDataRow[REQUIREMENTS_INDEX]
-    cleanedRequirementsVal = cleanText(requirementsVal, baselineStopwords)
+    cleanedRequirementsVal, requirementsWordUnsplicings = cleanText(requirementsVal, baselineStopwords, splicedWordsSearchDictionary= unsplicingDict)
     processedListing[REQUIREMENTS_LABEL] = cleanedRequirementsVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addRequirements(cleanedRequirementsVal)
+    allWordUnsplicings |= requirementsWordUnsplicings
 
     benefitsVal = rawDataRow[BENEFITS_INDEX]
-    cleanedBenefitsVal = cleanText(benefitsVal, baselineStopwords)
+    cleanedBenefitsVal, benefitsWordUnsplicings = cleanText(benefitsVal, baselineStopwords, splicedWordsSearchDictionary= unsplicingDict)
     processedListing[BENEFITS_LABEL] = cleanedBenefitsVal
     if shouldBuildSummaries:
         textAttributeSummariesObj.addBenefits(cleanedBenefitsVal)
+    allWordUnsplicings |= benefitsWordUnsplicings
 
-    return processedListing
+
+    return processedListing, allWordUnsplicings
 
 
 def loadData(fpath):
@@ -368,14 +409,23 @@ def loadData(fpath):
     allTextAttributes = TextAttributeSummaries()
     processedData = []
 
+    wordUnsplicingDict = engDict
+    cumulUnsplicedWords = set()
+
     with open(fpath, encoding="utf-8") as raw_csv:
         dataReader = csv.reader(raw_csv)
         tempHeaderRow = next(dataReader)  # eliminate header row
 
         # preprocesses the data as it's loaded
-        for row in dataReader:
-            processedRow = processJobListing(row, allCategories, allTextAttributes)
+        for rowInd, row in enumerate(dataReader):
+            print("processing the ", rowInd, "th row")
+            processedRow, unsplicedWords = processJobListing(row, allCategories, allTextAttributes, wordUnsplicingDict)
             processedData.append(processedRow)
+            cumulUnsplicedWords |= unsplicedWords
+
+    with open("wordUnsplicingsLog.txt", mode="w", encoding="utf-8") as spliceLogFile:
+        for unsplicingEntry in cumulUnsplicedWords:
+            spliceLogFile.write(str(unsplicingEntry) + "\n")
 
     return processedData, allCategories, allTextAttributes
 

@@ -4,6 +4,7 @@ import pathlib
 
 
 # Dataframe labels
+import enchant
 
 TITLE_LABEL = "title"
 LOCATION_LABEL = "location"
@@ -42,7 +43,7 @@ REQUIREMENTS_SUMMARY_FILENAME = "all_requirements.txt"
 BENEFITS_SUMMARY_FILENAME = "all_benefits.txt"
 
 
-
+#file names/paths
 
 srcDirStr = os.getcwd()
 srcDir = pathlib.Path(srcDirStr)
@@ -71,6 +72,21 @@ rawFpath = os.path.join(RAW_DATA_PATH, rawFname)
 cleanedDataPath = os.path.join(datasetDirPath, PROCESSED_FILE_PREFIX + rawFname)
 
 
+
+TITLES_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, TITLES_SUMMARY_FILENAME)
+LOCATIONS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, LOCATIONS_SUMMARY_FILENAME)
+DEPARTMENTS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, DEPARTMENTS_SUMMARY_FILENAME)
+COMPANY_PROFILES_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, COMPANY_PROFILES_SUMMARY_FILENAME)
+DESCRIPTIONS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, DESCRIPTIONS_SUMMARY_FILENAME)
+REQUIREMENTS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, REQUIREMENTS_SUMMARY_FILENAME)
+BENEFITS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, BENEFITS_SUMMARY_FILENAME)
+
+
+SPELL_CHECKER_PERSONAL_WORD_LIST_PATH= "SpellCheckerPersonalWordList.txt"
+
+LANG_CODE = "en_US"
+
+engDict = enchant.DictWithPWL(tag=LANG_CODE, pwl= SPELL_CHECKER_PERSONAL_WORD_LIST_PATH)
 
 
 TRAIN_DATA_PATH = os.path.join(datasetDirPath, "train_data.csv")
