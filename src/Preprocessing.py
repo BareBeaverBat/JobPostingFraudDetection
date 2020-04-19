@@ -135,6 +135,7 @@ class CategoriesSummary:
             for functionOption in self.functionVals:
                 functionOptionsFile.write("%s\n" % functionOption)
 
+TEXT_ENTRY_SPLITTER = "\n\n"
 
 class TextAttributeSummaries:
     def __init__(self):
@@ -147,25 +148,53 @@ class TextAttributeSummaries:
         self.cumulBenefitsText = ""
 
     def addTitle(self, currTitle):
-        self.cumulTitlesText += currTitle + "\n\n"
+        self.cumulTitlesText += currTitle + TEXT_ENTRY_SPLITTER
 
     def addLocation(self, currLocation):
-        self.cumulLocationsText += currLocation + "\n\n"
+        self.cumulLocationsText += currLocation + TEXT_ENTRY_SPLITTER
 
     def addDepartment(self, currDepartment):
-        self.cumulDepartmentsText += currDepartment + "\n\n"
+        self.cumulDepartmentsText += currDepartment + TEXT_ENTRY_SPLITTER
 
     def addCompanyProfile(self, currCompanyProfile):
-        self.cumulCompanyProfilesText += currCompanyProfile + "\n\n"
+        self.cumulCompanyProfilesText += currCompanyProfile + TEXT_ENTRY_SPLITTER
 
     def addDescription(self, currDescription):
-        self.cumulDescriptionsText += currDescription + "\n\n"
+        self.cumulDescriptionsText += currDescription + TEXT_ENTRY_SPLITTER
 
     def addRequirements(self, currRequirements):
-        self.cumulRequirementsText += currRequirements + "\n\n"
+        self.cumulRequirementsText += currRequirements + TEXT_ENTRY_SPLITTER
 
     def addBenefits(self, currBenefits):
-        self.cumulBenefitsText += currBenefits + "\n\n"
+        self.cumulBenefitsText += currBenefits + TEXT_ENTRY_SPLITTER
+
+    def getTitles(self):
+        titlesList = self.cumulTitlesText.split()
+        return titlesList
+
+    def getLocations(self):
+        locationsList = self.cumulLocationsText.split()
+        return locationsList
+
+    def getDepartments(self):
+        departmentsList = self.cumulDepartmentsText.split()
+        return departmentsList
+
+    def getCompanyProfiles(self):
+        companyProfilesList = self.cumulCompanyProfilesText.split()
+        return companyProfilesList
+
+    def getDescriptions(self):
+        descriptionsList=  self.cumulDescriptionsText.split()
+        return descriptionsList
+
+    def getRequirements(self):
+        requirementsList = self.cumulRequirementsText.split()
+        return requirementsList
+
+    def getBenefits(self):
+        benefitsList = self.cumulBenefitsText.split()
+        return benefitsList
 
     def saveToFile(self, dirPath):
         titlesSummaryFilePath = os.path.join(dirPath, TITLES_SUMMARY_FILENAME)
@@ -423,11 +452,14 @@ def loadData(fpath):
             processedData.append(processedRow)
             cumulUnsplicedWords |= unsplicedWords
 
+    processedDataDf = pd.DataFrame(processedData)
+
+
     with open("wordUnsplicingsLog.txt", mode="w", encoding="utf-8") as spliceLogFile:
         for unsplicingEntry in cumulUnsplicedWords:
             spliceLogFile.write(str(unsplicingEntry) + "\n")
 
-    return processedData, allCategories, allTextAttributes
+    return processedDataDf, allCategories, allTextAttributes
 
 
 if __name__ == "__main__":
@@ -436,8 +468,7 @@ if __name__ == "__main__":
         shutil.rmtree(datasetDirPath)
     os.mkdir(datasetDirPath)
 
-    cleanedData, categorySummaries, textAttributeSummaries = loadData(rawFpath)
-    cleanedDataDf = pd.DataFrame(cleanedData)
+    cleanedDataDf, categorySummaries, textAttributeSummaries = loadData(rawFpath)
 
     dataSaveResult = cleanedDataDf.to_csv(cleanedDataPath)
     if dataSaveResult is not None:

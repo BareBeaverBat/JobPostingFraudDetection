@@ -1,6 +1,6 @@
 import os
 import pathlib
-
+import numpy as np
 
 
 # Dataframe labels
@@ -30,6 +30,17 @@ HAS_LOGO_LABEL = "has_logo"
 HAS_QUESTIONS_LABEL = "has_questions"
 
 FRAUDULENT_LABEL = "IS_FRAUDULENT"
+
+COLUMN_DATA_TYPES = {TITLE_LABEL : np.unicode, LOCATION_LABEL : np.unicode, DEPARTMENT_LABEL : np.unicode,
+                     COMPANY_PROFILE_LABEL : np.unicode, DESCRIPTION_LABEL : np.unicode, REQUIREMENTS_LABEL: np.unicode,
+                     BENEFITS_LABEL : np.unicode, MIN_SALARY_LABEL : float, MAX_SALARY_LABEL : float,
+                     SALARY_RANGE_LABEL : float, SALARY_MIDPT_LABEL : float, EMPLOYMENT_TYPE_LABEL : int,
+                     REQUIRED_EXPERIENCE_LABEL : int, REQUIRED_EDUCATION_LABEL : int, INDUSTRY_LABEL : int,
+                     FUNCTION_LABEL : int, TELECOMMUTING_LABEL : bool, HAS_LOGO_LABEL : bool, HAS_QUESTIONS_LABEL: bool,
+                     FRAUDULENT_LABEL : bool}
+
+
+
 
 
 #dataset text attributes' summary files' names
