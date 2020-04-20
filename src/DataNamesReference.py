@@ -103,3 +103,11 @@ engDict = enchant.DictWithPWL(tag=LANG_CODE, pwl= SPELL_CHECKER_PERSONAL_WORD_LI
 TRAIN_DATA_PATH = os.path.join(datasetDirPath, "train_data.csv")
 VALIDATION_DATA_PATH = os.path.join(datasetDirPath, "valid_data.csv")
 TEST_DATA_PATH = os.path.join(datasetDirPath, "test_data.csv")
+
+
+CHECKPOINT_DIR_PATH= os.path.join(projectDir, "checkpoints")
+if not os.path.exists(CHECKPOINT_DIR_PATH):
+    os.mkdir(CHECKPOINT_DIR_PATH)
+
+
+
