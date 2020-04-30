@@ -13,6 +13,10 @@ import nltk
 from DataNamesReference import *
 
 
+
+engDict = enchant.DictWithPWL(tag=LANG_CODE, pwl= SPELL_CHECKER_PERSONAL_WORD_LIST_PATH)
+
+
 try:
     from nltk.corpus import stopwords
     dummyStopwords = stopwords.words("english")

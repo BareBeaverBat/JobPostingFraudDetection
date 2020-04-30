@@ -4,7 +4,6 @@ import numpy as np
 
 
 # Dataframe labels
-import enchant
 
 TITLE_LABEL = "title"
 LOCATION_LABEL = "location"
@@ -96,8 +95,6 @@ BENEFITS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, BENEFITS_SUMMARY_FILEN
 SPELL_CHECKER_PERSONAL_WORD_LIST_PATH= "SpellCheckerPersonalWordList.txt"
 
 LANG_CODE = "en_US"
-
-engDict = enchant.DictWithPWL(tag=LANG_CODE, pwl= SPELL_CHECKER_PERSONAL_WORD_LIST_PATH)
 
 
 TRAIN_DATA_PATH = os.path.join(datasetDirPath, "train_data.csv")
