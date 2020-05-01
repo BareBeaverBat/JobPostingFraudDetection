@@ -106,5 +106,9 @@ CHECKPOINT_DIR_PATH= os.path.join(projectDir, "checkpoints")
 if not os.path.exists(CHECKPOINT_DIR_PATH):
     os.mkdir(CHECKPOINT_DIR_PATH)
 
+TENSORBOARD_DIR_PATH= os.path.join(projectDir, "tboard_logs")
+if not os.path.exists(TENSORBOARD_DIR_PATH):
+    os.mkdir(TENSORBOARD_DIR_PATH)
+
 
 
