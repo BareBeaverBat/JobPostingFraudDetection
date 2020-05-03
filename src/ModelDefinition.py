@@ -1,7 +1,7 @@
 
 from tensorflow.keras import layers
 from tensorflow.keras import Model
-from hyperparameters import *
+from Hyperparameters import *
 import tensorflow.keras.regularizers as regs
 
 

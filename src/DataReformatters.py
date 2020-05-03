@@ -1,11 +1,12 @@
 
 from sklearn import preprocessing as skpreproc
 import tensorflow.keras.preprocessing as preproc
-from utils import getNonEmptyLines
+from UtilityFuncs import getNonEmptyLines
 import numpy as np
-from hyperparameters import *
+from Hyperparameters import *
 from DataNamesReference import *
 
+#todo implement use of word2vec pretrained embedding matrix
 
 #do final preprocessing on each text attrib
 def convertTitlesToPaddedSequences(dataDf):
