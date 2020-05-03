@@ -114,27 +114,27 @@ class CategoriesSummary:
         return findOrAdd(self.functionVals, currFunction, shouldAddNew)
 
     def saveToFiles(self, dirPath):
-        employmentTypeOptionsFilePath = os.path.join(dirPath, "employment_type_options.txt")
+        employmentTypeOptionsFilePath = os.path.join(dirPath, EMPLOYMENT_TYPE_OPTIONS_FILE_NAME)
         with open(employmentTypeOptionsFilePath, mode="w") as employmentTypeOptionsFile:
             for employmentTypeOption in self.employmentTypeVals:
                 employmentTypeOptionsFile.write("%s\n" % employmentTypeOption)
 
-        requiredExperienceOptionsFilePath = os.path.join(dirPath, "required_experience_options.txt")
+        requiredExperienceOptionsFilePath = os.path.join(dirPath, REQUIRED_EXPERIENCE_OPTIONS_FILE_NAME)
         with open(requiredExperienceOptionsFilePath, mode="w") as requiredExperienceOptionsFile:
             for requiredExperienceOption in self.requiredExperienceVals:
                 requiredExperienceOptionsFile.write("%s\n" % requiredExperienceOption)
 
-        requiredEducationOptionsFilePath = os.path.join(dirPath, "required_education_options.txt")
+        requiredEducationOptionsFilePath = os.path.join(dirPath, REQUIRED_EDUCATION_OPTIONS_FILE_NAME)
         with open(requiredEducationOptionsFilePath, mode="w") as requiredEducationOptionsFile:
             for requiredEducationOption in self.requiredEducationVals:
                 requiredEducationOptionsFile.write("%s\n" % requiredEducationOption)
 
-        industryOptionsFilePath = os.path.join(dirPath, "industry_options.txt")
+        industryOptionsFilePath = os.path.join(dirPath, INDUSTRY_OPTIONS_FILE_NAME)
         with open(industryOptionsFilePath, mode="w") as industryOptionsFile:
             for industryOption in self.industryVals:
                 industryOptionsFile.write("%s\n" % industryOption)
 
-        functionOptionsFilePath = os.path.join(dirPath, "function_options.txt")
+        functionOptionsFilePath = os.path.join(dirPath, FUNCTION_OPTIONS_FILE_NAME)
         with open(functionOptionsFilePath, mode="w") as functionOptionsFile:
             for functionOption in self.functionVals:
                 functionOptionsFile.write("%s\n" % functionOption)

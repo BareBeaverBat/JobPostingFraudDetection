@@ -91,6 +91,12 @@ DESCRIPTIONS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, DESCRIPTIONS_SUMMA
 REQUIREMENTS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, REQUIREMENTS_SUMMARY_FILENAME)
 BENEFITS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, BENEFITS_SUMMARY_FILENAME)
 
+EMPLOYMENT_TYPE_OPTIONS_FILE_NAME = "employment_type_options.txt"
+REQUIRED_EXPERIENCE_OPTIONS_FILE_NAME= "required_experience_options.txt"
+REQUIRED_EDUCATION_OPTIONS_FILE_NAME = "required_education_options.txt"
+INDUSTRY_OPTIONS_FILE_NAME = "industry_options.txt"
+FUNCTION_OPTIONS_FILE_NAME = "function_options.txt"
+
 
 SPELL_CHECKER_PERSONAL_WORD_LIST_PATH= "SpellCheckerPersonalWordList.txt"
 
@@ -111,4 +117,5 @@ if not os.path.exists(TENSORBOARD_DIR_PATH):
     os.mkdir(TENSORBOARD_DIR_PATH)
 
 
+CSV_READ_ARGS = {"keep_default_na":False, "index_col":0, "dtype":COLUMN_DATA_TYPES}
 
