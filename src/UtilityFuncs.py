@@ -31,8 +31,13 @@ def evaluateModel(modelName, datasetType, labels, predictions):
 
     falsePositiveRates, truePositiveRates, rocThresholds = sklMetrics.roc_curve(labels, predictions,
                                                                                 drop_intermediate=False)
-    aucVal = sklMetrics.auc(falsePositiveRates, truePositiveRates)
-    print("Area under ROC curve (should equal AUROC score above): ", aucVal)
+
+    summaryRocThresholds = np.quantile(rocThresholds, (0, 0.1, 0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1))
+    print("Summary of thresholds (of model output) for ROC curve\n",
+          "(0th, 10th, 20th...80th, 90th, 100th percentiles):\n",
+          summaryRocThresholds)
+
+
 
     plt.plot(falsePositiveRates, truePositiveRates, 'bo')
     plt.xlabel("False Positive Rate")

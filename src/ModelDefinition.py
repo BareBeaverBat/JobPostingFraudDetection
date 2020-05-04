@@ -181,23 +181,35 @@ fullMergeLayer = layers.Concatenate(
     functionInputLayer, telecommutingInputLayer, hasLogoInputLayer, hasQuestionsInputLayer, salaryInputLayer])
 
 fullDenseLayer1 = layers.Dense(name="firstFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
-                               units=3*BASE_DENSE_SIZE, activation=DENSE_ACTIVATION)(fullMergeLayer)
+                               units=int(3.5*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullMergeLayer)
 fullDropoutLayer1 = layers.Dropout(name="firstFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer1)
 
 fullDenseLayer2 = layers.Dense(name="secondFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
-                               units=2*BASE_DENSE_SIZE, activation=DENSE_ACTIVATION)(fullDropoutLayer1)
+                               units=int(3*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer1)
 fullDropoutLayer2 = layers.Dropout(name="secondFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer2)
 
 fullDenseLayer3 = layers.Dense(name="thirdFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
-                               units=int(BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer2) # fullDropoutLayer2)
+                               units=int(2.5*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer2) # fullDropoutLayer2)
 fullDropoutLayer3= layers.Dropout(name="thirdFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer3)
 
 fullDenseLayer4 = layers.Dense(name="fourthFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
-                               units=0.5*int(BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer3) # fullDropoutLayer2)
+                               units=int(2*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer3) # fullDropoutLayer2)
 fullDropoutLayer4= layers.Dropout(name="fourthFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer4)
 
+fullDenseLayer5 = layers.Dense(name="fifthFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
+                               units=int(1.5*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer4) # fullDropoutLayer2)
+fullDropoutLayer5= layers.Dropout(name="fifthFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer5)
 
-finalBatchNormLayer = layers.BatchNormalization(name="finalBatchNormalization")(fullDropoutLayer4)
+fullDenseLayer6 = layers.Dense(name="sixthFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
+                               units=int(1*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer5) # fullDropoutLayer2)
+fullDropoutLayer6= layers.Dropout(name="sixthFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer6)
+
+fullDenseLayer7 = layers.Dense(name="seventhFullDense", kernel_regularizer=regs.l2(BASE_DENSE_LAMBDA),
+                               units=int(0.5*BASE_DENSE_SIZE), activation=DENSE_ACTIVATION)(fullDropoutLayer6) # fullDropoutLayer2)
+fullDropoutLayer7= layers.Dropout(name="seventhFullDropout", rate=BASE_DENSE_DROPOUT)(fullDenseLayer7)
+
+
+finalBatchNormLayer = layers.BatchNormalization(name="finalBatchNormalization")(fullDropoutLayer7)
 
 
 finalPrediction = layers.Dense(1, name="finalPred", activation="sigmoid") (finalBatchNormLayer)
