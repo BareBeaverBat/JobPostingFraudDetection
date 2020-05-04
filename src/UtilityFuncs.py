@@ -33,5 +33,10 @@ def evaluateModel(modelName, datasetType, labels, predictions):
                                                                                 drop_intermediate=False)
     aucVal = sklMetrics.auc(falsePositiveRates, truePositiveRates)
     print("Area under ROC curve (should equal AUROC score above): ", aucVal)
+
     plt.plot(falsePositiveRates, truePositiveRates, 'bo')
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    rocPlotTitle= "ROC curve for " + modelName + " on " + datasetType + " data"
+    plt.title(rocPlotTitle)
     plt.show()
