@@ -59,37 +59,37 @@ srcDirStr = os.getcwd()
 srcDir = pathlib.Path(srcDirStr)
 projectDir = srcDir.parent
 
-DATA_PATH = os.path.join(projectDir, "data")
-if not os.path.exists(DATA_PATH):
-    os.mkdir(DATA_PATH)
+dataPath = os.path.join(projectDir, "data")
+if not os.path.exists(dataPath):
+    os.mkdir(dataPath)
 
-RAW_DATA_PATH = os.path.join(DATA_PATH, "raw")
-if not os.path.exists(RAW_DATA_PATH):
-    os.mkdir(RAW_DATA_PATH)
+rawDataPath = os.path.join(dataPath, "raw")
+if not os.path.exists(rawDataPath):
+    os.mkdir(rawDataPath)
 
-PROCESSED_DATA_PATH = os.path.join(DATA_PATH, "processed")
-if not os.path.exists(PROCESSED_DATA_PATH):
-    os.mkdir(PROCESSED_DATA_PATH)
+processedDataPath = os.path.join(dataPath, "processed")
+if not os.path.exists(processedDataPath):
+    os.mkdir(processedDataPath)
 
 PROCESSED_FILE_PREFIX = "cleaned_"
 
 datasetDirName = PROCESSED_FILE_PREFIX + "kaggle_fake_job_postings"
-datasetDirPath = os.path.join(PROCESSED_DATA_PATH, datasetDirName)
+datasetDirPath = os.path.join(processedDataPath, datasetDirName)
 
 rawFname = "fake_job_postings.csv"
-rawFpath = os.path.join(RAW_DATA_PATH, rawFname)
+rawFpath = os.path.join(rawDataPath, rawFname)
 
 cleanedDataPath = os.path.join(datasetDirPath, PROCESSED_FILE_PREFIX + rawFname)
 
 
 
-TITLES_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, TITLES_SUMMARY_FILENAME)
-LOCATIONS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, LOCATIONS_SUMMARY_FILENAME)
-DEPARTMENTS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, DEPARTMENTS_SUMMARY_FILENAME)
-COMPANY_PROFILES_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, COMPANY_PROFILES_SUMMARY_FILENAME)
-DESCRIPTIONS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, DESCRIPTIONS_SUMMARY_FILENAME)
-REQUIREMENTS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, REQUIREMENTS_SUMMARY_FILENAME)
-BENEFITS_SUMMARY_FILE_PATH = os.path.join(datasetDirPath, BENEFITS_SUMMARY_FILENAME)
+titlesSummaryFilePath = os.path.join(datasetDirPath, TITLES_SUMMARY_FILENAME)
+locationsSummaryFilePath = os.path.join(datasetDirPath, LOCATIONS_SUMMARY_FILENAME)
+departmentsSummaryFilePath = os.path.join(datasetDirPath, DEPARTMENTS_SUMMARY_FILENAME)
+companyProfilesSummaryFilePath = os.path.join(datasetDirPath, COMPANY_PROFILES_SUMMARY_FILENAME)
+descriptionsSummaryFilePath = os.path.join(datasetDirPath, DESCRIPTIONS_SUMMARY_FILENAME)
+requirementsSummaryFilePath = os.path.join(datasetDirPath, REQUIREMENTS_SUMMARY_FILENAME)
+benefitsSummaryFilePath = os.path.join(datasetDirPath, BENEFITS_SUMMARY_FILENAME)
 
 EMPLOYMENT_TYPE_OPTIONS_FILE_NAME = "employment_type_options.txt"
 REQUIRED_EXPERIENCE_OPTIONS_FILE_NAME= "required_experience_options.txt"
@@ -103,18 +103,18 @@ SPELL_CHECKER_PERSONAL_WORD_LIST_PATH= "SpellCheckerPersonalWordList.txt"
 LANG_CODE = "en_US"
 
 
-TRAIN_DATA_PATH = os.path.join(datasetDirPath, "train_data.csv")
-VALIDATION_DATA_PATH = os.path.join(datasetDirPath, "valid_data.csv")
-TEST_DATA_PATH = os.path.join(datasetDirPath, "test_data.csv")
+trainDataPath = os.path.join(datasetDirPath, "train_data.csv")
+validationDataPath = os.path.join(datasetDirPath, "valid_data.csv")
+testDataPath = os.path.join(datasetDirPath, "test_data.csv")
 
 
-CHECKPOINT_DIR_PATH= os.path.join(projectDir, "checkpoints")
-if not os.path.exists(CHECKPOINT_DIR_PATH):
-    os.mkdir(CHECKPOINT_DIR_PATH)
+checkpointDirPath= os.path.join(projectDir, "checkpoints")
+if not os.path.exists(checkpointDirPath):
+    os.mkdir(checkpointDirPath)
 
-TENSORBOARD_DIR_PATH= os.path.join(projectDir, "tboard_logs")
-if not os.path.exists(TENSORBOARD_DIR_PATH):
-    os.mkdir(TENSORBOARD_DIR_PATH)
+tensorboardDirPath= os.path.join(projectDir, "tboard_logs")
+if not os.path.exists(tensorboardDirPath):
+    os.mkdir(tensorboardDirPath)
 
 
 CSV_READ_ARGS = {"keep_default_na":False, "index_col":0, "dtype":COLUMN_DATA_TYPES}

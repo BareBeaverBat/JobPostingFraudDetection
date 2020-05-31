@@ -10,7 +10,7 @@ from DataNamesReference import *
 
 #do final preprocessing on each text attrib
 def convertTitlesToPaddedSequences(dataDf):
-    allTitles = getNonEmptyLines(TITLES_SUMMARY_FILE_PATH)
+    allTitles = getNonEmptyLines(titlesSummaryFilePath)
     allTitles.append(START_TOKEN)
     titleTokenizer = preproc.text.Tokenizer(num_words=TITLE_VOCAB_SIZE)
     titleTokenizer.fit_on_texts(allTitles)
@@ -23,7 +23,7 @@ def convertTitlesToPaddedSequences(dataDf):
     return paddedTrainTitleSequences
 
 def convertLocationsToPaddedSequences(dataDf):
-    allLocations = getNonEmptyLines(LOCATIONS_SUMMARY_FILE_PATH)
+    allLocations = getNonEmptyLines(locationsSummaryFilePath)
     allLocations.append(START_TOKEN)
     locationTokenizer = preproc.text.Tokenizer(num_words=LOCATION_VOCAB_SIZE)
     locationTokenizer.fit_on_texts(allLocations)
@@ -36,7 +36,7 @@ def convertLocationsToPaddedSequences(dataDf):
     return paddedTrainLocationSequences
 
 def convertDepartmentsToPaddedSequences(dataDf):
-    allDepartments = getNonEmptyLines(DEPARTMENTS_SUMMARY_FILE_PATH)
+    allDepartments = getNonEmptyLines(departmentsSummaryFilePath)
     allDepartments.append(START_TOKEN)
     departmentTokenizer = preproc.text.Tokenizer(num_words=DEPARTMENT_VOCAB_SIZE)
     departmentTokenizer.fit_on_texts(allDepartments)
@@ -49,7 +49,7 @@ def convertDepartmentsToPaddedSequences(dataDf):
     return paddedTrainDepartmentSequences
 
 def convertCompanyProfilesToPaddedSequences(dataDf):
-    allCompanyProfiles = getNonEmptyLines(COMPANY_PROFILES_SUMMARY_FILE_PATH)
+    allCompanyProfiles = getNonEmptyLines(companyProfilesSummaryFilePath)
     allCompanyProfiles.append(START_TOKEN)
     companyProfileTokenizer = preproc.text.Tokenizer(num_words=COMPANY_PROFILE_VOCAB_SIZE)
     companyProfileTokenizer.fit_on_texts(allCompanyProfiles)
@@ -62,7 +62,7 @@ def convertCompanyProfilesToPaddedSequences(dataDf):
     return paddedTrainCompanyProfileSequences
 
 def convertDescriptionsToPaddedSequences(dataDf):
-    allDescriptions = getNonEmptyLines(DESCRIPTIONS_SUMMARY_FILE_PATH)
+    allDescriptions = getNonEmptyLines(descriptionsSummaryFilePath)
     allDescriptions.append(START_TOKEN)
     descriptionTokenizer = preproc.text.Tokenizer(num_words=DESCRIPTION_VOCAB_SIZE)
     descriptionTokenizer.fit_on_texts(allDescriptions)
@@ -75,7 +75,7 @@ def convertDescriptionsToPaddedSequences(dataDf):
     return paddedTrainDescriptionSequences
 
 def convertRequirementsToPaddedSequences(dataDf):
-    allRequirements = getNonEmptyLines(REQUIREMENTS_SUMMARY_FILE_PATH)
+    allRequirements = getNonEmptyLines(requirementsSummaryFilePath)
     allRequirements.append(START_TOKEN)
     requirementsTokenizer = preproc.text.Tokenizer(num_words=REQUIREMENTS_VOCAB_SIZE)
     requirementsTokenizer.fit_on_texts(allRequirements)
@@ -88,7 +88,7 @@ def convertRequirementsToPaddedSequences(dataDf):
     return paddedTrainRequirementsSequences
 
 def convertBenefitsToPaddedSequences(dataDf):
-    allBenefits = getNonEmptyLines(BENEFITS_SUMMARY_FILE_PATH)
+    allBenefits = getNonEmptyLines(benefitsSummaryFilePath)
     allBenefits.append(START_TOKEN)
     benefitsTokenizer = preproc.text.Tokenizer(num_words=BENEFITS_VOCAB_SIZE)
     benefitsTokenizer.fit_on_texts(allBenefits)
